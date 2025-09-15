@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pumpfun Challenge Overlay</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background: transparent;
+    color: white;
+  }
+
+  /* Challenge distance box */
+  #overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    padding: 20px 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    min-width: 260px;
+  }
+  #km {
+    font-size: 32px;
+    font-weight: bold;
+    color: #00ff88;
+  }
+  #miles {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffaa00;
+    margin-top: 5px;
+  }
+  #transactionList {
+    margin-top: 15px;
+    font-size: 14px;
+    text-align: left;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  .buy {
+    color: #00FF00;
+    font-weight: bold;
+  }
+  .sell {
+    color: #FF0000;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<div id="overlay">
+  <div>Challenge Distance</div>
+  <div id="km">0 km</div>
+  <div id="miles">0 mi</div>
+  <div id="transactionList">
+    Buys/Sells will appear here
+  </div>
+</div>
+
+<script>
+  // ===== Challenge Distance Logic =====
+  let totalBuys = 0;
+  let totalSells = 0;
+
+  function updateChallengeOverlay() {
+    totalBuys += Math.random() * 0.5;   // up to 0.5 SOL buy
+    totalSells += Math.random() * 0.2;  // up to 0.2 SOL sell
+
+    const km = (totalBuys * 1) - (totalSells * 0.25);
+    const miles = km * 0.621371;
+
+    document.getElementById("km").innerText = km.toFixed(2) + " km";
+    document.getElementById("miles").innerText = miles.toFixed(2) + " mi";
+  }
+
+  setInterval(updateChallengeOverlay, 3000);
+  updateChallengeOverlay();
+
+  // ===== Transaction List Logic =====
+  const transactionList = document.getElementById('transactionList');
+
+  function formatDistance(km) {
+    const miles = (km * 0.621371).toFixed(2);
+    return `${km.toFixed(2)} km / ${miles} mi`;
+  }
+
+  function addTransaction(type, amount) {
+    const distance = formatDistance(amount);
+    const div = document.createElement('div');
+    div.className = type === 'buy' ? 'buy' : 'sell';
+    div.textContent = `${type.toUpperCase()}: ${amount} SOL — ${distance}`;
+    transactionList.appendChild(div);
+
+    // Keep only the last 5 transactions to save space
+    if(transactionList.children.length > 5){
+      transactionList.removeChild(transactionList.firstChild);
+    }
+
+    transactionList.scrollTop = transactionList.scrollHeight;
+  }
+
+  // Simulate incoming transactions
+  setInterval(() => {
+    const type = Math.random() > 0.5 ? 'buy' : 'sell';
+    const amount = Math.floor(Math.random() * 5) + 1;
+    addTransaction(type, amount);
+  }, 3000);
+
+</script>
+</body>
+</html>
